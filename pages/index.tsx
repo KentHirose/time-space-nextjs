@@ -244,7 +244,7 @@ const Home: NextPage = () => {
             onClick={handleRouteSearch}
             className="bg-primary text-white my-2"
           >
-            ルート検索
+            検索
           </Button>
         </div>
       </div>

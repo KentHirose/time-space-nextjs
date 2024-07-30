@@ -10,7 +10,9 @@ interface MapProps {
 
 const Map: React.FC<MapProps> = ({ center, markers, onLoad }) => {
   return (
-    <Box sx={{ width: '100%', height: '500px' }}>
+    <Box sx={{ width: '100%', height: '500px' }} 
+    style={{ marginTop: "10px", marginBottom: "30px" }}
+    >
       <GoogleMap
         mapContainerStyle={{ width: '100%', height: '100%' }}
         center={center}
