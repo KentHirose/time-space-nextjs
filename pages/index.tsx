@@ -40,7 +40,8 @@ const Home: NextPage = () => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [origin, setOrigin] = useState<google.maps.LatLngLiteral | null>(null);
   const [originName, setOriginName] = useState<string>("");
-  const [destination, setDestination] = useState<google.maps.LatLngLiteral | null>(null);
+  const [destination, setDestination] =
+    useState<google.maps.LatLngLiteral | null>(null);
   const [destinationName, setDestinationName] = useState<string>("");
   const [center, setCenter] = useState<google.maps.LatLngLiteral>({
     lat: 35.6764,
@@ -140,11 +141,14 @@ const Home: NextPage = () => {
 
   const handleSearchRoute = async () => {
     try {
-      const response = await axios.get("https://space-time-db.onrender.com/route_search", {
-        params: {
-          name: searchName,
-        },
-      });
+      const response = await axios.get(
+        "https://space-time-db.onrender.com/route_search",
+        {
+          params: {
+            name: searchName,
+          },
+        }
+      );
       const data = response.data;
       setOriginName(data.origin);
       setDestinationName(data.destination);
@@ -156,35 +160,94 @@ const Home: NextPage = () => {
   };
 
   return (
-    <Container>
-      <Typography variant="h4" component="h1" gutterBottom>
+    <Container
+      className="p-4"
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
+      <Typography
+        variant="h3"
+        component="h1"
+        gutterBottom
+        className="text-primary"
+        style={{ fontWeight: "bold", marginTop: "60px", marginBottom: "30px" }}
+      >
         RouteSync
       </Typography>
-      <SearchBox
-        onPlacesChanged={(places) => handlePlacesChanged(places, "origin")}
-        placeholder="出発地を検索"
-        value={originName}
-        onChange={(e) => setOriginName(e.target.value)}
-      />
-      <SearchBox
-        onPlacesChanged={(places) => handlePlacesChanged(places, "destination")}
-        placeholder="目的地を検索"
-        value={destinationName}
-        onChange={(e) => setDestinationName(e.target.value)}
-      />
-      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
-        <DateTimePicker
-          label="到着時刻"
-          value={arrivalTime}
-          onChange={(newValue) => setArrivalTime(newValue)}
-        />
-      </LocalizationProvider>
-      <Button variant="contained" color="primary" onClick={handleRouteSearch}>
-        ルート検索
-      </Button>
-      <Button variant="contained" color="secondary" onClick={handleOpenDialog}>
-        登録されたデータを使用
-      </Button>
+      <div
+        style={{
+          // 上と下に余白
+          marginTop: "30px",
+          marginBottom: "20px",
+        }}
+      >
+        <Typography
+          variant="h5"
+          component="h1"
+          gutterBottom
+          className="text-secondary"
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "10px",
+            width: "100%",
+            fontWeight: "bold",
+          }}
+        >
+          情報を入力してルートを検索
+        </Typography>
+        {/* 中央に設置 */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "10px",
+            width: "100%",
+          }}
+        >
+          <Button onClick={handleOpenDialog}>↓登録されたデータを使用</Button>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "10px",
+            width: "100%",
+          }}
+        >
+          <SearchBox
+            onPlacesChanged={(places) => handlePlacesChanged(places, "origin")}
+            placeholder="出発地を検索"
+            value={originName}
+            onChange={(e) => setOriginName(e.target.value)}
+          />
+          <SearchBox
+            onPlacesChanged={(places) =>
+              handlePlacesChanged(places, "destination")
+            }
+            placeholder="目的地を検索"
+            value={destinationName}
+            onChange={(e) => setDestinationName(e.target.value)}
+          />
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
+            <DateTimePicker
+              label="到着時刻"
+              value={arrivalTime}
+              onChange={(newValue) => setArrivalTime(newValue)}
+              className="my-2"
+            />
+          </LocalizationProvider>
+          <Button
+            variant="contained"
+            onClick={handleRouteSearch}
+            className="bg-primary text-white my-2"
+          >
+            ルート検索
+          </Button>
+        </div>
+      </div>
       <Map
         center={center}
         markers={
@@ -193,56 +256,105 @@ const Home: NextPage = () => {
         onLoad={handleMapLoad}
       />
       {route.length > 0 && (
-        <div>
-          <Typography variant="h6" component="h2" gutterBottom>
-            ルート検索結果
+        <div className="my-4">
+          <Typography
+            variant="h6"
+            component="h2"
+            gutterBottom
+            style={{
+              fontWeight: "bold",
+              textAlign: "center",
+              marginTop: "30px",
+              marginBottom: "30px",
+            }}
+          >
+            ルート検索結果(クリックしてカレンダーに追加)
           </Typography>
           <ul>
             {route.map((step, index) => (
-              <li key={index}>
-                {step.origin} から {step.destination} まで {step.transportation}{" "}
-                で {step.departure} に出発し、{step.arrival} に到着
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  href={generateGoogleCalendarUrl(step)}
-                  target="_blank"
-                  rel="noopener noreferrer"
+              <li key={index} className="my-2">
+                <input
+                  type="checkbox"
+                  id={`route-${index}`}
+                  style={{ marginRight: "10px" }}
+                />
+                <label
+                  htmlFor={`route-${index}`}
+                  onClick={() => {
+                    const checkbox = document.getElementById(`route-${index}`) as HTMLInputElement;
+                    checkbox.checked = !checkbox.checked;
+                  }}
                 >
-                  カレンダーに追加
-                </Button>
+                  <a
+                    href={generateGoogleCalendarUrl(step)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: "none", color: "blue" }}
+                  >
+                    <strong>{step.origin}</strong>から
+                    <strong>{step.destination}</strong>まで
+                    <strong>{step.transportation}</strong>で{" "}
+                    <strong>
+                      {format(new Date(step.departure), "M月d日 HH:mm")}
+                    </strong>
+                    に出発し、
+                    <strong>
+                      {format(new Date(step.arrival), "M月d日 HH:mm")}
+                    </strong>
+                    に到着
+                  </a>
+                </label>
               </li>
             ))}
           </ul>
+          <div
+            className="my-4"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              marginTop: "30px",
+              marginBottom: "30px",
+            }}
+          >
+            <Typography
+              variant="h6"
+              component="h2"
+              gutterBottom
+              style={{ fontWeight: "bold" }}
+            >
+              ルート情報をデータベースに保存
+            </Typography>
+            <TextField
+              label="登録名"
+              value={registerName}
+              onChange={(e) => setRegisterName(e.target.value)}
+              size="small" // サイズを小さくする
+              className="my-2"
+              style={{ width: "200px" }} // 横幅を小さくする
+            />
+            <Typography variant="body1" gutterBottom>
+              出発地: {origin ? `${origin.lat}, ${origin.lng}` : "未設定"}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              目的地:{" "}
+              {destination
+                ? `${destination.lat}, ${destination.lng}`
+                : "未設定"}
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleRouteRegister}
+              disabled={!origin || !destination || !registerName}
+              className="bg-primary text-white my-2"
+            >
+              保存
+            </Button>
+          </div>
         </div>
       )}
-      <div>
-        <Typography variant="h6" component="h2" gutterBottom>
-          ルート情報を登録
-        </Typography>
-        <TextField
-          label="登録名"
-          value={registerName}
-          onChange={(e) => setRegisterName(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <Typography variant="body1" gutterBottom>
-          出発地: {origin ? `${origin.lat}, ${origin.lng}` : "未設定"}
-        </Typography>
-        <Typography variant="body1" gutterBottom>
-          目的地:{" "}
-          {destination ? `${destination.lat}, ${destination.lng}` : "未設定"}
-        </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleRouteRegister}
-          disabled={!origin || !destination || !registerName}
-        >
-          登録
-        </Button>
-      </div>
+
       <Dialog open={open} onClose={handleCloseDialog}>
         <DialogTitle>登録されたデータを使用</DialogTitle>
         <DialogContent>
@@ -252,6 +364,7 @@ const Home: NextPage = () => {
             onChange={(e) => setSearchName(e.target.value)}
             fullWidth
             margin="normal"
+            className="my-2"
           />
         </DialogContent>
         <DialogActions>

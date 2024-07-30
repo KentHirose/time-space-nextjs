@@ -30,7 +30,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onPlacesChanged, placeholder, val
       type="text"
       placeholder={placeholder}
       variant="outlined"
-      fullWidth
       value={value}
       onChange={onChange}
     />
