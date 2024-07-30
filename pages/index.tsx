@@ -233,10 +233,8 @@ const Home: NextPage = () => {
           />
           <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
             <DateTimePicker
-              label="到着時刻"
               value={arrivalTime}
               onChange={(newValue) => setArrivalTime(newValue)}
-              className="my-2"
             />
           </LocalizationProvider>
           <Button
